@@ -14,8 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+
+from rest_framework import routers
+# importanto o meu bookviewset
+from books.api import viewsets as booksets
+
+# criando o router
+route =routers.DefaultRouter()
+# registando o meu viewset no roter
+route.register(r'saidin-book', booksets.BooksViewSet, basename='MBooks')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # registando omeu view no app do django na  rota / {127.0.0.1:8000/}
+    path('',include(route.urls))
+    
 ]

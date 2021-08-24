@@ -2,7 +2,7 @@ from django.db import models
 from uuid import uuid4
 
 # Create your models here.
-class Book(models.Model):
+class Books(models.Model):
     """[this is Books Model ] which has as atribute :
     id_book, {book is}
     title =book title
