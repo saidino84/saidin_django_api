@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView #Views  que vao me dar acesso ao token
+
+
 from rest_framework import routers
 # importanto o meu bookviewset
 from books.api import viewsets as booksets
@@ -28,6 +32,11 @@ route.register(r'saidin-book', booksets.BooksViewSet, basename='MBooks')
 urlpatterns = [
     path('admin/', admin.site.urls),
     # registando omeu view no app do django na  rota / {127.0.0.1:8000/}
+     # ------------
+    path('token/',TokenObtainPairView.as_view()),
+    path('token/refresh/', TokenRefreshView.as_view()),
+    # -----------------------------
     path('',include(route.urls))
     
 ]
+

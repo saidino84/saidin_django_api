@@ -187,3 +187,186 @@ urlpatterns = [
 
 
 ```
+Thanks to !()[https://youtu.be/wtl8ZyCbTbg]
+
+# 7 para acessar o delete update precisamos passar id do book cadastrado  
+na routa 127.0.0.1:8000/
+apresenta todos os dados /uma lista de json k tem dentro do banco de
+pode -se cadatrar e entao pra modificalo precisaomos copiar o url e acessarmos o link
+>> GET 127.0.0.1:5000/saidin-book/be97b95d-a576-4df0-9f65-5100acadd676/ 
+aqui aparecem todas as opcoes deste book do id especificado
+```json
+[delete] [put] [patch] isso poderas fazer no navegador
+
+{
+    "id_book": "be97b95d-a576-4df0-9f65-5100acadd676",
+    "title": "Brincando com aprogramacao",
+    "author": "saidino",
+    "release_year": 6,
+    "pages": 17,
+    "publishing_company": "Tylor Gang",
+    "created_at": "2021-08-24T08:51:34.653345Z"
+}
+```
+
+# 8 TESTANDO COM PYTHON
+```py
+
+from requests import post,get, delete
+
+url ='http://192.168.43.66:8000/saidin-book/'
+rs=get(url).json()
+
+print('YOUR DATA')
+print(rs)
+
+try:
+    input('vai fazer post')
+    pos=post(url, data={
+    "title": input('titulo'),
+    "author": input('author ?'),
+    "release_year": int(input('ano')),
+    "pages": int(input('pages')),
+    "publishing_company": "Tylor Gang",
+     
+})
+    print('POST SUCESFULL')
+    input('vai deletar')
+    index=int(input(f'qual deles o deletas ? pk sao: {len(rs)}'))
+    if index <=len(rs)-1:
+        d=delete(url+rs[index].get("id_book") )
+    
+        print('Delete ok !')
+    else:
+        print('o id especificado nao foi encontrado')
+    
+except Exception as e:
+    print(f'error {e}')
+```
+
+
+# 9 ADICIONANDO JWT NA API
+
+>>pip intall djangorestframework-simplejwt
+
+# 10 configurations iniciais
+
+Feito a Intalacoa djangorestframework-simplejwt, adicionamos uma nova seccao /no arquivo de configuracoa do project
+
+```py
+ "saidin_django_api/library/settings.py"
+ depos da AUTH_PASSWORD_VALIDATORS =[
+     ....,
+     ....
+]
+"WE ADD THAT restframework sessiomn/setting to our project"
+REST_FRAMEWORK ={
+    'DEFAULT_AUTHENTICATION_CLASSES':('rest_framework_simplejwt.authentication.JWTAuthentication')
+}
+NESTA SESSAO 'E ONDE AGENTE ADICIONA VARIAS CONFIGURATIONS DENTRO DO PROJECTO'
+```
+
+# 11 NEXT STEP 'E CRIAR UM Url onde sera responsavel para redirecionar os meus usuarios com asenha e o servidor me retornar um jwt
+para comecar importamos duas Views de rest_framework_simplejwt 
+```py
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView #Views  que vao me dar acesso ao token
+
+"""Feito as importacoes (isso dentro do arquivo urls.py) adicionamos mais duas rotas no nosso
+"""
+urlpatterns =[
+    path('admin/', admin.site.urls),
+    path('',include(route.urls))
+        ]
+
+        "Alem destas rotas adicionarei outras views que sao rest k acabei de importa la"
+
+urlpatterns =[
+    path('admin/', admin.site.urls),
+    # ------------
+    path('token',TokenObtainPairView.as_view()),
+    path('token/refresh/', TokenRefreshView.as_view()),
+    # -----------------------------
+    path('',include(route.urls))
+        ]
+```
+
+# 12 PARA TAL PRECISAMOS CRIAR UM SUPERUSER NO BANCO DE DADOS
+
+>> python manage.py create superuser
+username :admin
+password: root (strong one)
+>> portanto tendo criado o TokenObtainPairView e TokenRefreshView se formos a dar opest na rota:
+```py
+from requests import post
+url='192.168.43.1:5000/token'
+d=r.post('http://192.168.43.66:5000/token/',json={'username':'saidino','password':'root'})
+print(d.json())
+>>"""
+
+{
+    'refresh': 
+'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYyOTg5MjEyMCwianRpIjoiZDhiMDBiNzJmMGVmNDQwMDgxN2M2OWZiNGExZDNiOWQiLCJ1c2VyX2lkIjoxfQ.Z6dkQ_1TVOY9jOrN4nTeVortDyyaHAKC2k6Vf0eAH3g', 
+
+'access': 
+'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI5ODA2MDIwLCJqdGkiOiJmYWEzOWFjNzY3NTc0NDZkODhiYWM1YzUwMzFlZGJiYyIsInVzZXJfaWQiOjF9.FO_zK-vIJ9I0HeeIpc0JuYj6acjKE6_jkbWZUoMiitM'
+}
+"""
+#se ja tem um super usr n banco 
+post(url, json={'username':'admin','password':'root'})
+
+"it return an json with token refresh and access"
+{
+    "refresh":'jahuishsuasxzczazxxacatq8qoquqhdskhqwoihqqiiwuuq88691286r927wwdtsghhxrdrtsdg',
+    "access":'u773yshhjxgguwexwhxhw8ewjeww8wud'
+}
+
+
+```
+>>[ NOTA B ] A nossa tota de api ainda nao defeni como auteticavel de acesso para tal vou codar ai 
+
+# CONFIGURANDO AMINHA ROTA DE ACESSO A API COMO ACESSIVEL COM Token
+
+> como dizer ao servidor que rota/ deve ser autenticada (so acessada com token)
+
+SO PRECISAMOS FAZER UMA COISA /MODIFICARMOS O NOSSO viewSet de book 
+impoortando nesse mesmo arquivo o IsAuthenticated
+
+```py
+/books/api/viewsets.py
+'antes  {sem authenticacoa}'
+from rest_framework import viewsets
+from books.api import serializer
+from books import models
+
+class BooksViewSet(viewsets.ModelViewSet):
+    serializer_class = serializer.BooksSerializer
+    queryset = models.Books.objects.all() # refiro me a todos campos do meu modelo Books
+
+'depois {tornando ela autheticavel}'
+
+from rest_framework import viewsets
+from books.api import serializer
+from books import models
+
+from rest_framework.permissions import IsAuthenticated
+
+class BooksViewSet(viewsets.ModelViewSet):
+    permission_class = (IsAuthenticated,)
+    serializer_class = serializer.BooksSerializer
+    queryset = models.Books.objects.all() # refiro me a todos campos do meu modelo Books
+    
+# BOOOM  Show de bolla vc nao fara requisicao mais no meu api sem estares autenticada
+
+```
+
+# Testando
+```py
+from requests import post,get
+['TESTANDO]
+url='localhost:5000/'
+['first']
+'get acess token from /api only if you are authenticated as user admin'
+token=pos('localhost:5000/api/',json={'username';'saidino','password':'root'}).json()['access']
+
+t=get(url,headers={"Content-Type": "application/json",'Authorization':f'Bear {token}'})
+```
