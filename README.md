@@ -360,13 +360,73 @@ class BooksViewSet(viewsets.ModelViewSet):
 ```
 
 # Testando
-```py
-from requests import post,get
-['TESTANDO]
-url='localhost:5000/'
-['first']
-'get acess token from /api only if you are authenticated as user admin'
-token=pos('localhost:5000/api/',json={'username';'saidino','password':'root'}).json()['access']
 
-t=get(url,headers={"Content-Type": "application/json",'Authorization':f'Bear {token}'})
+# Testando
+```py
+from requests import get,post
+import os
+
+os.system('clear')
+url='http://192.168.43.66:5000/'
+api_tokens=post(url+'token/',json={'username':'saidino','password':'root'})
+
+# print(api_tokens.json())
+def get_acess_token():
+    acess_token=None
+    if 'access' in api_tokens.json():
+        print('yes got token sucessfully')
+        print(f'{api_tokens.json()}'if 'y'in  input('what to see ? n/y') else '')
+        acess_token=api_tokens.json()['access']
+
+    else:
+        print('no token found')
+    return acess_token
+
+def get_api_data(access_token):
+    if access_token != None:
+        data =get(url+'saidin-book/', headers={'Authorization':f'Bearer {access_token}'})
+        print(data.json())
+
+if __name__ =='__main__':
+    api_key=get_acess_token()
+    data =get_api_data(api_key)
 ```
+
+# USANDO DART / FLUTTER PARA CONSUMER COM O MESMO METODO
+- [ x ] adicionarei adependencia do dio nao depencies
+
+```dart
+import 'package:dio/dio.dart';
+
+class Service {
+  String url = 'http://192.168.43.66:5000/';
+  Dio _dio = Dio();
+
+  Future<String?> get_token() async {
+    var _token = await _dio.post(url + "token/",
+        data: {'username': 'saidino', 'password': 'root'});
+    print(_token.data['access']);
+
+    return await _token.data['access'];
+  }
+
+  show_data() async {
+    var token = await get_token();
+    print(" THE TOKEN RECEIED $token");
+    if (token == null) {
+      return '';
+    }
+    // Adicionando os headers dessa api para acessar
+    _dio.options.headers['Authorization'] = 'Bearer $token';
+    var data = await _dio.get(url + 'saidin-book/');
+    print(data.data);
+  }
+}
+
+main() {
+  var service = Service();
+  service.get_token();
+  service.show_data();
+}
+
+
