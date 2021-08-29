@@ -360,8 +360,6 @@ class BooksViewSet(viewsets.ModelViewSet):
 ```
 
 # Testando
-
-# Testando
 ```py
 from requests import get,post
 import os
@@ -430,3 +428,5 @@ main() {
 }
 
 
+
+```
