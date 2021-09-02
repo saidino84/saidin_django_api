@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+"""imports de definicao de url de images que farei upload"""
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView #Views  que vao me dar acesso ao token
 
@@ -36,7 +40,7 @@ urlpatterns = [
     path('token/',TokenObtainPairView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
     # -----------------------------
-    path('',include(route.urls))
-    
-]
+    path('',include(route.urls)),
+    # adicionando aminhas urls de images de upload
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
