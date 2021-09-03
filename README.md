@@ -23,7 +23,7 @@ using pipenv
 >>python3 -m pip install pipenv
 
 pipenv shell
->>pip install django,djangorestframework,djangorestframework_simplejwt,django-heroku,pillow,requests
+>>pipenv install django,djangorestframework,djangorestframework_simplejwt,django-heroku,pillow,requests,django-heroku/django-on-heroku (for heroku deployment *django-heroku fails to install pys2g..)
 
 'generate requirements.txt'
 >>pipenv lock -r > requirements.txt
@@ -538,12 +538,13 @@ urlpatterns = [
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
 
-```
+
 >> pip install pillow [to work with images]
 >> python manage.py makemigrations 
 >> python manage.py migrate
 
 >> python manage.py runserver 0:8000
+```
 ```json
 "http://192.168.43.66:8000/saidin-book/" 
 retorna um json do tipo:
@@ -559,7 +560,7 @@ retorna um json do tipo:
     "image": "http://192.168.43.66:8000/media/a580741a-1c26-4c16-aaa4-8d7ca6d1989f_Screenshot_20210516-082441_YouTube.jpg"
 },
 ]
-```
+ ```
 
 # 10 FAZENDO DEPLOY NO HEROKU
 [https://www.youtube.com/watch?v=01iXLbvGcNE&list=PLcM_74VFgRhrZZf3b7PaK3xQlfQi3kEkg&index=2]
@@ -587,7 +588,7 @@ este nome sem urls
 # 12 Instalar dependecias do django-heroku 
 assim ja vamos deixar o banco de dados local/ sqlite irei usar um database robusto k o
 proprio heroku disponibiliza k 'e o postGrel
->> pip install django-heroku
+>> pip install django-heroku   #nowadays it fails it cuz was abandoned
 
 import django-heroku  dentro settings do project
  e no fim da linha do mesmo adicione
@@ -595,3 +596,25 @@ import django-heroku  dentro settings do project
 
 'para dizer k vai usar tudo k esta local dentro do heroku'
  django_heroku.settings(locals()) 
+
+# deploy to heroku hence it is ready for deployment
+```sh
+>> git add .
+>> git commit -m 'prontos'
+>> git push origin main
+
+'addinto to heroku'
+>>git push heroku master
+'se der tudo certo e hora de testar o app'
+note que o db ainda nao foi criado ainda e nem fiz os migrations para tal preciso
+>> heroku addons:create heroku-postgresql:hobby-dev
+para criar um database de postgresql
+'''
+Creating heroku-postgresql:hobby-dev on ⬢ saidino-django-api... free
+Database has been created and is available
+ ! This database is empty. If upgrading, you can transfer
+ ! data from another database with pg:copy
+Created postgresql-amorphous-44493 as DATABASE_URL
+Use heroku addons:docs heroku-postgresql to view documentation
+
+'''
